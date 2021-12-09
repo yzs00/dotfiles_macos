@@ -1,0 +1,8 @@
+#!/usr/bin/local/bash - bashのTAB補完を設定する
+# -*- shell-script -*-
+
+#
+# .bash_completions
+#
+
+[[ -f /usr/local/etc/bash_completion ]] && . /usr/local/etc/bash_completion
