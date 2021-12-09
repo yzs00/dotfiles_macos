@@ -2,46 +2,22 @@
 # -*- shell-script -*-
 
 #
-# Install -- インストールスクリプト用bashライブラリ
+# Install -- libinstall.sh を使って定義済みのパッケージのインストールとリンクを行う。
 #
 
 #set -x    # デバッグ時には -x オプションをつける
 #set -e    # source して使うときは、-e をつけない
 
-SRC_DIR=$(pwd)
+_SRC_DIR=$(pwd)
 _PROGNAME="$0"
 
 # デフォルトでは強制再インストールはしない。
-if [ "x$_FORCE" = "x" ]; then _FORCE="false"; fi
+[[ -z "$_FORCE" ]] && _FORCE="false"
 
 # デフォルトでは、メッセージを出力する。
-if [ "x$_VERBOSE" = "x" ]; then _VERBOSE="true"; fi
+[[ -z "$_VERBOSE" ]] && _VERBOSE="true"
 
 source ./libinstall.sh
 
-# ライブラリに定義しておいたインストールスクリプト群を順に実行。
-# パッケージをインストールして必要なセットアップを行う。
-# _FORCE='true' にすると既インストールも再インストール。
-# install_XXXX() の一覧を得るには: `grep "^function install_" libinstall.sh`
-function install_all(){
-    install_homebrew
-    install_bash
-    install_git
-    install_tmux
-    install_openssh
-    install_emacs
-    install_kitty
-    install_fonts
-}
-
-# ライブラリに定義しておいたデプロイクリプト群を順に実行
-# deploy_XXX() の一覧を得るには: `grep "^function deploy_" libinstall.sh`
-function deploy_all(){
-    deploy_bash
-    deploy_tmux
-    deploy_emacs
-    deploy_kitty
-}
-
-install_all
-deploy_all
+dots_install
+dots_deploy

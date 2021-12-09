@@ -5,11 +5,31 @@
 # libinstall.sh -- インストールスクリプト用 bash ライブラリ
 #
 
+# # formulaのインストール用関数の雛形
+# function dots_install_PKG(){
+#     pkgs=""
+#     _install $pkgs
+# }
+
+# # caskのインストール用関数の雛形
+# function dots_install_cask_PKG(){
+#     pkgs=""
+#     _install $pkgs
+# }
+
+# # パッケージ用の dotfile をリンクする関数の雛形
+# function dots_deploy_PKG(){
+#     dotfiles=""
+#     for f in $dotfiles; do
+#         _deploy $_SRC_DIR/$f $HOME/$f
+#     done
+# }
+
 #set -x    # デバッグ時には -x オプションをつける
 #set -e    # source して使うときは、-e をつけない
 
 [[ -z $_PROGNAME ]] && _PROGNAME="install"
-[[ -z $SRC_DIR   ]] && SRC_DIR=$(pwd)
+[[ -z $_SRC_DIR  ]] && _SRC_DIR=$(pwd)
 [[ -z $_FORCE    ]] && _FORCE="false"
 [[ -z $_VERBOSE  ]] && _VERBOSE="true"
 
@@ -40,7 +60,7 @@ function _do_install(){
     [[ -z $pkgs ]] && return
     _info "$pkgs をインストールします..."
     brew install $pkgs
-    _info "$(brew list --formula --versions $pkgs) をインストールしました"
+    _info "$(brew list --formula --versions $pkgs) をインストールしました。"
 }
 
 function _do_install_cask(){
@@ -48,7 +68,7 @@ function _do_install_cask(){
     [[ -z $pkgs ]] && return
     _info "$pkgs をインストールします..."
     brew install --cask $pkgs
-    _info "$(brew list --cask --versions $pkgs) をインストールしました"
+    _info "$(brew list --cask --versions $pkgs) をインストールしました。"
 }
 
 function _install(){
@@ -62,7 +82,7 @@ function _install(){
                     if [ ! -d "/usr/local/Cellar/$pkg" ]; then
                         _do_install $pkg
                     else
-                        _info "$(brew list --formula --versions $pkg) はインストール済みです"
+                        _info "$(brew list --formula --versions $pkg) はインストール済みです。"
                     fi
                 done
                 ;;
@@ -78,7 +98,7 @@ function _install(){
                             *)            exit 0 ;;
                         esac
                     else
-                        _info "$(brew list --formula --versions $pkg) はインストール済みです"
+                        _info "$(brew list --formula --versions $pkg) はインストール済みです。"
                     fi
                 done
                 ;;
@@ -91,7 +111,7 @@ function _install(){
             if [ ! -d "/usr/local/Cellar/$pkg" ]; then
                 _do_install $pkg
             else
-                _info "$(brew list --formula --versions $pkg) はインストール済みです"
+                _info "$(brew list --formula --versions $pkg) はインストール済みです。"
             fi
         done
     fi
@@ -108,7 +128,7 @@ function _install_cask(){
                     if [ ! -d "/usr/local/Caskroom/$pkg" ]; then
                         _do_install_cask $pkg
                     else
-                        _info "$(brew list --cask --versions $pkg) はインストール済みです"
+                        _info "$(brew list --cask --versions $pkg) はインストール済みです。"
                     fi
                 done
                 ;;
@@ -124,7 +144,7 @@ function _install_cask(){
                             *)            exit 0 ;;
                         esac
                     else
-                        _info "$(brew list --cask --versions $pkg) はインストール済みです"
+                        _info "$(brew list --cask --versions $pkg) はインストール済みです。"
                     fi
                 done
                 ;;
@@ -136,7 +156,7 @@ function _install_cask(){
             if [ ! -d "/usr/local/Caskroom/$pkg" ]; then
                 _do_install_cask $pkg
             else
-                _info "$(brew list --cask --versions $pkg) はインストール済みです"
+                _info "$(brew list --cask --versions $pkg) はインストール済みです。"
             fi
         done
     fi
@@ -163,50 +183,50 @@ function install_homebrew(){
         _info "$pkgs をインストールします..."
         /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
         brew update
-        _info "$(brew --version | head -1) をインストールしました"
+        _info "$(brew --version | head -1) をインストールしました。"
     else
-        _info "$(brew --version | head -1) はインストール済みです"
+        _info "$(brew --version | head -1) はインストール済みです。"
     fi
 }
 
 # bash
-function install_bash(){
+function dots_install_bash(){
     pkgs="bash bash-completion grc mg"
     pkgs="$pkgs coreutils grep diffutils gnu-sed gawk grep make"
     pkgs="$pkgs tree htop neofetch"
     pkgs="$pkgs iproute2mac"
     _install $pkgs
     _warn "新しい bash をログインシェルにするには..."
-    _warn "    以下を実行してください"
+    _warn "    以下を実行してください。"
     _warn "    echo \"/usr/local/bin/bash\" | sudo tee /etc/shells"
     _warn "    passwd -s /usr/local/bin/bash"
     _warn "man で終了時に表示をクリアしないようにするには..."
-    _warn "    以下を実行してください"
+    _warn "    以下を実行してください。"
     _warn "    sudo mv /etc/man.conf /etc/man.conf.orig"
     _warn "    sed -e \"/^PAGER/s/\(less -is\)$/\1rX/\" -e \"/^BROWSER/s/\(less -is\$)/\1rX/\" /etc/man.conf.orig | sudo tee /etc/man.conf"
 }
-function deploy_bash(){
+function dots_deploy_bash(){
     dotfiles=".bash_profile .bashrc .bash_aliases .bash_completions"
     for f in $dotfiles; do
-        _deploy $SRC_DIR/$f $HOME/$f
+        _deploy $_SRC_DIR/$f $HOME/$f
     done
 }
 
 # git
-function install_git(){
+function dots_install_git(){
     pkgs="git gh"
     _install $pkgs
     _warn "git の環境を設定するには..."
-    _warn "    以下を実行してください"
+    _warn "    以下を実行してください。"
     _warn "    git config --global user.name YOUR_NAME"
     _warn "    git config --global user.email MAIL@example.com"
     _warn "    git config --global core.editor YOUR_EDITOR"
     _warn "gh で github にログインするには..."
-    _warn "    \`gh auth login\` を実行してください"
+    _warn "    \`gh auth login\` を実行してください。"
 }
 
 # tmux
-function install_tmux(){
+function dots_install_tmux(){
     pkgs="tmux ncurses"
     _install $pkgs
     ver=$(brew list --versions ncurses | awk '{ print $2 }')
@@ -219,25 +239,25 @@ function install_tmux(){
         $brew_infocmp tmux-256color > $HOME/tmux-256color.info
         $mac_tic -xe tmux-256color $HOME/tmux-256color.info
         rm $HOME/tmux-256color.info
-        _info "tmux 用の terminfo を \"\$HOME/.terminfo/74/tmux-256color\" に置きました"
+        _info "tmux 用の terminfo を \"\$HOME/.terminfo/74/tmux-256color\" に置きました。"
         _info "使っているターミナルに合わせて、ファイルの置き場所が変わることがあります"
     fi
 }
-function deploy_tmux(){
+function dots_deploy_tmux(){
     dotfiles=".tmux.conf"
     for f in $dotfiles; do
-        _deploy $SRC_DIR/$f $HOME/$f
+        _deploy $_SRC_DIR/$f $HOME/$f
     done
 }
 
 # openssh
-function install_openssh(){
+function dots_install_openssh(){
     pkgs="openssh"
     _install $pkgs
     _warn "ssh 用の鍵ペアを作るには..."
-    _warn "    \`ssh-keygen -C \"$USER@$(hostname) \$(date \"+%Y-%m-%d\")\"\` を実行してください"
+    _warn "    \`ssh-keygen -C \"$USER@$(hostname) \$(date \"+%Y-%m-%d\")\"\` を実行してください。"
     _warn "リモートホストに公開鍵を送るには..."
-    _warn "    \`ssh-copy-id USER@REMOTEHOST\` を実行してください"
+    _warn "    \`ssh-copy-id USER@REMOTEHOST\` を実行してください。"
 }
 
 #
@@ -245,39 +265,39 @@ function install_openssh(){
 #
 
 # emacs
-function install_emacs(){
+function dots_install_emacs(){
     cpkgs="emacs-mac"
     tap=railwaycat/emacsmacport
     ! brew tap | grep "$tap" > /dev/null 2>&1 && brew tap $tap
     _install_cask $cpkgs
     mkdir -p $HOME/.emacs.d
-    _info "emacs は、\"Emacs Mac Port\" を選択しています"
+    _info "emacs は、\"Emacs Mac Port\" を選択しています。"
 }
-function deploy_emacs(){
+function dots_deploy_emacs(){
     dotfiles=".emacs.d/init.el"
     mkdir -p $HOME/.emacs.d
     for f in $dotfiles; do
-        _deploy $SRC_DIR/$f $HOME/$f
+        _deploy $_SRC_DIR/$f $HOME/$f
     done
 }
 
 # kitty
-function install_kitty(){
+function dots_install_kitty(){
     cpkgs="kitty"
     _install_cask $cpkgs
     mkdir -p .config/kitty
     curl -o $HOME/.config/kitty/kitty.conf.orig https://sw.kovidgoyal.net/kitty/_downloads/433dadebd0bf504f8b008985378086ce/kitty.conf
-    _info "kitty の設定ファイルのオリジナルを \".config/kitty/kitty.conf.orig\" に置きました"
+    _info "kitty の設定ファイルのオリジナルを \".config/kitty/kitty.conf.orig\" に置きました。"
 }
-function deploy_kitty(){
+function dots_deploy_kitty(){
     dotfiles=".config/kitty/kitty.conf"
     for f in $dotfiles; do
-        _deploy $SRC_DIR/$f $HOME/$f
+        _deploy $_SRC_DIR/$f $HOME/$f
     done
 }
 
 # fonts
-function install_fonts(){
+function dots_install_fonts(){
     pkgs="fontconfig"
     cpkgs="font-noto-sans-cjk-jp font-noto-serif-cjk-jp font-mplus"
     _install $pkgs
@@ -288,22 +308,29 @@ function install_fonts(){
     _info "フォントキャッシュを更新しました。"
 }
 
-# formulaのインストール用関数の雛形
-function _install_pkgs(){
-    pkgs=""
-    _install $pkgs
+#
+# 定義した dots_install_PKG 関数と dots_deploy_PKG 関数を順に実行する。
+#
+
+# パッケージをインストールして必要なセットアップを行う。
+# _FORCE='true' にすると既インストールも再インストール。
+# dots_install_PKG() の一覧を得るには: `grep "^function dots_install_" libinstall.sh`
+function dots_install(){
+    dots_install_homebrew
+    dots_install_bash
+    dots_install_git
+    dots_install_tmux
+    dots_install_openssh
+    dots_install_emacs
+    dots_install_kitty
+    dots_install_fonts
 }
 
-# caskのインストール用関数の雛形
-function _install_cask_pkgs(){
-    pkgs=""
-    _install $pkgs
-}
-
-# パッケージ用の dotfile をリンクする関数の雛形
-function _deploy_pkgs(){
-    dotfiles=""
-    for f in $dotfiles; do
-        _deploy $SRC_DIR/$f $HOME/$f
-    done
+# このディレクトリから $HOME にシンボリックをはる。
+# dots_deploy_PKG() の一覧を得るには: `grep "^function dots_deploy_" libinstall.sh`
+function dots_deploy(){
+    dots_deploy_bash
+    dots_deploy_tmux
+    dots_deploy_emacs
+    dots_deploy_kitty
 }
